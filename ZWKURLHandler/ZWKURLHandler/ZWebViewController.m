@@ -73,7 +73,6 @@
 
 #pragma mark - 重定向
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
-    // 开启了拦截
     if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
         NSHTTPURLResponse *httpResp = (NSHTTPURLResponse *)navigationResponse.response;
         NSInteger statusCode = httpResp.statusCode;
@@ -83,6 +82,7 @@
         if (statusCode >= 300 && statusCode < 400 && redirectUrl && newRequestUrl) {
             //记录下重定向之前的url, 不要显示错误界面
             self.redirectUrl = redirectUrl;
+            //这里cancel掉, 然后直接load新的url
             decisionHandler(WKNavigationResponsePolicyCancel);
             _request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:newRequestUrl] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
             [self.webView loadRequest:_request];

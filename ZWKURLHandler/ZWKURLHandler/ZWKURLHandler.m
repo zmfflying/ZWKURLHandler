@@ -51,13 +51,15 @@
     NSURLRequest *request = [urlSchemeTask request];
     NSURL *url = request.URL;
     NSString *httpMethod = [request.HTTPMethod uppercaseString];
-    if (![httpMethod containsString:@"GET"]) { //所有的非get请求不用匹配本地
+    //所有的非get请求不用匹配本地
+    if (![httpMethod containsString:@"GET"]) {
         [self handleOnlineRequst:request urlSchemeTask:urlSchemeTask];
     }else {
         BOOL checkOffline = [self handleOfflineURLSchemeTaskWithTask:urlSchemeTask forURL:url];
         if (!checkOffline) {
+            //文件过大时手动切片
             NSMutableURLRequest *sliceDataRequest = [self sliceDataRequest:request];
-            if (sliceDataRequest) { //文件过大时手动切片
+            if (sliceDataRequest) {
                 request = sliceDataRequest;
             }
             [self handleOnlineRequst:request urlSchemeTask:urlSchemeTask];
@@ -190,7 +192,8 @@
     NSString *requestUrlStr = request.URL.absoluteString.copy;
     
     NSURLSessionTask *task = [self.session dataTaskWithRequest:mutaRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        if (!weakSelf || weakSelf.isControllerDealloced || !urlSchemeTask || ![weakSelf.holdUrlSchemeTasks objectForKey:urlSchemeTask.request.requestId]) {
+        if (weakSelf.isControllerDealloced || !urlSchemeTask || ![weakSelf.holdUrlSchemeTasks objectForKey:urlSchemeTask.request.requestId]) {
+            //过滤掉已经stop的网络请求
             return;
         }
         //避免 The task has already been stopped 这个断言导致的崩溃
@@ -200,7 +203,7 @@
                 [urlSchemeTask didFailWithError:error];
             }else{
                 //处理下重定向
-                NSHTTPURLResponse *httpResp = [self handleRedirectUrlWithResponse:response requestUrlStr:requestUrlStr];
+                NSHTTPURLResponse *httpResp = [weakSelf handleRedirectUrlWithResponse:response requestUrlStr:requestUrlStr];
                 [urlSchemeTask didReceiveResponse:httpResp];
                 if (data) {
                     [urlSchemeTask didReceiveData:data];
