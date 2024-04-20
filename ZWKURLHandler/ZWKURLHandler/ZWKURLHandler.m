@@ -4,6 +4,8 @@
 
 
 #import "ZWKURLHandler.h"
+#import "ZEventStreamHandler.h"
+
 @interface WKWebView (HandlesURLScheme)
 @end
 
@@ -31,6 +33,8 @@
 @property (nonatomic,strong) NSMutableDictionary *holdUrlSchemeTasks;
 ///记录controller是否销毁,避免发起多余的请求
 @property (nonatomic, assign) BOOL isControllerDealloced;
+///记录当前的流handler
+@property (nonatomic, weak) ZEventStreamHandler *eventStreamHandler;
 @end
 
 @implementation ZWKURLHandler
@@ -40,6 +44,7 @@
     _isControllerDealloced = YES;
     [self.holdUrlSchemeTasks removeAllObjects];
     [self.session invalidateAndCancel];
+    [self.eventStreamHandler removeAllActivitiesSchemeTasks];
 }
 
 #pragma mark - WKURLSchemeTask 处理
@@ -51,6 +56,14 @@
     NSURLRequest *request = [urlSchemeTask request];
     NSURL *url = request.URL;
     NSString *httpMethod = [request.HTTPMethod uppercaseString];
+    
+    //流请求处理
+    NSString *accept = request.allHTTPHeaderFields[@"Accept"];
+    if (accept && accept.length > 0 && [accept containsString:@"text/event-stream"]) {
+        [self handleStreamURLSchemeTaskWithTask:urlSchemeTask forRequest:request];
+        return;
+    }
+    
     //所有的非get请求不用匹配本地
     if (![httpMethod containsString:@"GET"]) {
         [self handleOnlineRequst:request urlSchemeTask:urlSchemeTask];
@@ -72,6 +85,42 @@
     if ([self.holdUrlSchemeTasks objectForKey:key]) {
         [self.holdUrlSchemeTasks removeObjectForKey:key];
     }
+}
+
+#pragma mark - 流请求处理
+- (void)handleStreamURLSchemeTaskWithTask:(__weak id <WKURLSchemeTask>)urlSchemeTask forRequest:(NSURLRequest *)request {
+    NSString *requestId = urlSchemeTask.request.requestId;
+    self.holdUrlSchemeTasks[requestId] = @1;;
+
+    ZEventStreamHandler *handler = [[ZEventStreamHandler alloc] initWithRequest:request];
+    self.eventStreamHandler = handler;
+    
+    __weak typeof(self) weakSelf = self;
+    handler.responseHandler = ^(NSURLResponse *response) {
+        [urlSchemeTask didReceiveResponse:response];
+    };
+    handler.dataHandler = ^(NSData *data) {
+        if (!weakSelf || weakSelf.isControllerDealloced || !urlSchemeTask || ![weakSelf.holdUrlSchemeTasks objectForKey:urlSchemeTask.request.requestId]) {
+            return;
+        }
+        @try {
+            [urlSchemeTask didReceiveData:data];
+        } @catch (NSException *exception) {
+        }
+    };
+    handler.completeHandler = ^(NSError *error) {
+        if (!weakSelf || weakSelf.isControllerDealloced || !urlSchemeTask || ![weakSelf.holdUrlSchemeTasks objectForKey:urlSchemeTask.request.requestId]) {
+            return;
+        }
+        @try {
+            if (error) {
+                [urlSchemeTask didFailWithError:error];
+            }else{
+                [urlSchemeTask didFinish];
+            }
+        } @catch (NSException *exception) {
+        }
+    };
 }
 
 #pragma mark - 走本地逻辑

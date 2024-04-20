@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F649A952BD36BB500921515 /* ZEventStreamHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F649A942BD36BB500921515 /* ZEventStreamHandler.m */; };
 		3FDB21CF2AB034E800BA4709 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FDB21CE2AB034E800BA4709 /* AppDelegate.m */; };
 		3FDB21D52AB034E800BA4709 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FDB21D42AB034E800BA4709 /* ViewController.m */; };
 		3FDB21D82AB034E800BA4709 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3FDB21D62AB034E800BA4709 /* Main.storyboard */; };
@@ -39,6 +40,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3F649A932BD36BB500921515 /* ZEventStreamHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZEventStreamHandler.h; sourceTree = "<group>"; };
+		3F649A942BD36BB500921515 /* ZEventStreamHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZEventStreamHandler.m; sourceTree = "<group>"; };
 		3FDB21CA2AB034E800BA4709 /* ZWKURLHandler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZWKURLHandler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FDB21CD2AB034E800BA4709 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3FDB21CE2AB034E800BA4709 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -117,6 +120,8 @@
 				3FDB22032AB03AF700BA4709 /* ZWebViewController.m */,
 				3FDB22052AB03B2F00BA4709 /* ZWKURLHandler.h */,
 				3FDB22062AB03B2F00BA4709 /* ZWKURLHandler.m */,
+				3F649A932BD36BB500921515 /* ZEventStreamHandler.h */,
+				3F649A942BD36BB500921515 /* ZEventStreamHandler.m */,
 				3FDB22082AB0484600BA4709 /* yohohho.jpg */,
 				3FDB21D62AB034E800BA4709 /* Main.storyboard */,
 				3FDB21D92AB034EB00BA4709 /* Assets.xcassets */,
@@ -277,6 +282,7 @@
 			files = (
 				3FDB21D52AB034E800BA4709 /* ViewController.m in Sources */,
 				3FDB21CF2AB034E800BA4709 /* AppDelegate.m in Sources */,
+				3F649A952BD36BB500921515 /* ZEventStreamHandler.m in Sources */,
 				3FDB21E02AB034EB00BA4709 /* main.m in Sources */,
 				3FDB22042AB03AF700BA4709 /* ZWebViewController.m in Sources */,
 				3FDB22072AB03B2F00BA4709 /* ZWKURLHandler.m in Sources */,
